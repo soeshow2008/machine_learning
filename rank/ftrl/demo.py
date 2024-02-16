@@ -8,8 +8,8 @@ import math;
 FEATURE_DIM = 3;
 
 #
-b = 0.0;
-a = 0.5;
+b = 0.8;
+a = -0.5;
 
 def build_train_data(num):
     features = np.random.rand(num, FEATURE_DIM);
