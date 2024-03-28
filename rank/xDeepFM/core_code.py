@@ -13,6 +13,7 @@ for layer_size in cin_layers:
             outer_product = tf.matmul(vec_i, vec_j);
             outer_product_list.append(outer_product);
     outer_product_matrix = tf.concat(outer_product_list, axis=1);
+    outer_product_matrix = tf.reshape(outer_product_matrix, [batch_size, field_num * field_num]);
     glorot = tf.initializers.glorot_normal();
     W = tf.Variable(glorot([field_num * deep_fid_num, layer_size]), dtype=tf.float32);
     b = tf.Variable(tf.zeros([layer_size]), dtype=tf.float32);
