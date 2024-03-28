@@ -21,9 +21,12 @@ input_features = inputs;#tf.placeholder(tf.float32, shape=[None, field_size, emb
 
 # SENET层
 # Squeeze: Global Average Pooling，对embedding_size维度求平均
-squeeze = tf.reduce_mean(input_features, axis=-1, keepdims=True)
-print("###squeeze", squeeze);
-squeeze = tf.reshape(squeeze, shape=[-1, field_size]);
+squeeze_mean = tf.reduce_mean(input_features, axis=-1, keepdims=True)
+squeeze_mean = tf.reshape(squeeze_mean, shape=[-1, field_size]);
+squeeze_max = tf.reduce_max(input_features, axis=-1, keepdims=True)
+squeeze_max = tf.reshape(squeeze_max, shape=[-1, field_size]);
+squeeze = tf.concat([squeeze_mean, squeeze_max], axis=1);
+
 # Excitation: 两层全连接网络，第一层降维，第二层升维
 reduced_size = max(1, field_size // reduction_ratio)
 #excitation = tf.contrib.layers.fully_connected(inputs=squeeze,
@@ -38,18 +41,19 @@ excitation = tf.keras.layers.Dense(units=reduced_size,
                                    bias_initializer='zeros')(squeeze);
 print("###excitation", excitation)
 #excitation = tf.contrib.layers.fully_connected(inputs=excitation,
-#                                               num_outputs=field_size * embedding_size,
+#                                               num_outputs=field_size,
 #                                               scope="senet_2",
 #                                               activation_fn=tf.nn.sigmoid,
 #                                               );
-excitation = tf.keras.layers.Dense(units=field_size * embedding_size,
+excitation = tf.keras.layers.Dense(units=field_size,
                                    activation='sigmoid',
                                    use_bias=True,
                                    kernel_initializer='glorot_uniform',
                                    bias_initializer='zeros')(excitation);
-excitation = tf.reshape(excitation, shape=[-1, field_size, embedding_size]);
+excitation = tf.reshape(excitation, shape=[-1, field_size, 1]);
 # 重新校准特征
-scale = input_features * excitation
+scale = input_features * excitation;
+scale = scale + input_features;
 print("###input_features", input_features);
 print("###excitation", excitation);
 print("###scale", scale);
