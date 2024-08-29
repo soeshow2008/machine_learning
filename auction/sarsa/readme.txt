@@ -1,0 +1,1 @@
+Sarsa算法和Q-learning基本一样，不同是最后的action是依赖本身策略选择和执行的，所以是on-policy算法；而Q-learning的action是epsilon-greedy产出的，不一致，所以是off-policy
